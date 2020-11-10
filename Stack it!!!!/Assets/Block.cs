@@ -10,24 +10,35 @@ public class Block : MonoBehaviour
 
 
 
-    [SerializeField] float _speed = 1f; 
+    [SerializeField] public float _speed = 1f; 
     
 
     private void OnEnable()
     {
+        
         if (LastBlock == null)
            LastBlock = GameObject.Find("StartingBlock").GetComponent<Block>();
         
         CurrentBlock = this; 
+
+        transform.localScale = new Vector3(LastBlock.transform.localScale.x, transform.localScale.y, 1); 
     }
 
     internal void Stop()
     {
-        _speed = 0;
+        
         float hangover = transform.position.x - LastBlock.transform.position.x;
-        Debug.Log(hangover);
+        if (Mathf.Abs(hangover) >= LastBlock.transform.localScale.x)
+        {
+            LastBlock = null; 
+            CurrentBlock = null; 
+        }
+
+
 
         SplitBlockonX(hangover); 
+        LastBlock = CurrentBlock; 
+        _speed = 0;
     }
 
     private void SplitBlockonX(float hangover)
@@ -36,8 +47,10 @@ public class Block : MonoBehaviour
         float fallingBlockSize = transform.localScale.x - newXSize; 
 
         float newXPosition = LastBlock.transform.position.x + (hangover / 2);
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, newXSize); 
-        transform.position = new Vector3(transform.position.x, transform.position.y, newXPosition); 
+        transform.localScale = new Vector3(newXSize, transform.localScale.y, 1); 
+        transform.position = new Vector3(0, transform.position.y, newXPosition); 
+        
+        
     }
 
 
